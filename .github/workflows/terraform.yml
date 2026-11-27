@@ -44,6 +44,10 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: aws sts get-caller-identity
 
+      - name: Terraform Init (S3 Remote Backend)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: terraform init -reconfigure -input=false
+
       - name: Terraform Plan (read-only)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: terraform plan -input=false -no-color -var-file=terraform.tfvars.example
