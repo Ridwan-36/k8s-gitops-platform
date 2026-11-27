@@ -6,3 +6,6 @@ node_instance_type  = "t3.small"
 node_desired_size   = 2
 node_min_size       = 1
 node_max_size       = 3
+
+# Replace this documentation-only IP with your own /32 in local terraform.tfvars
+cluster_endpoint_public_access_cidrs = ["203.0.113.10/32"]

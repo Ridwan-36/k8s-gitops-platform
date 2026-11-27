@@ -134,6 +134,7 @@ resource "aws_eks_cluster" "platform" {
     subnet_ids              = aws_subnet.public[*].id
     endpoint_public_access  = true
     endpoint_private_access = true
+    public_access_cidrs     = var.cluster_endpoint_public_access_cidrs
   }
 
   depends_on = [
