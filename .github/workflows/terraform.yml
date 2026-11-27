@@ -1,26 +1,44 @@
-name: Terraform Validation
+name: Terraform CI and AWS OIDC
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-  workflow_dispatch:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   validate:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: hashicorp/setup-terraform@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.9.8
+          terraform_version: 1.17.2
+
       - name: Terraform Format
         run: terraform fmt -check -recursive
+
       - name: Terraform Init
-        run: terraform init -backend=false
+        run: terraform init -backend=false -input=false
+
       - name: Terraform Validate
         run: terraform validate
+
+      - name: Configure AWS OIDC
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::301949382920:role/GitHubActionsTerraformRole
+          aws-region: ap-south-1
+
+      - name: Verify AWS Identity
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: aws sts get-caller-identity
